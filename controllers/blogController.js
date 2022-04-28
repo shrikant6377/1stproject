@@ -85,43 +85,48 @@ const updateBlogs = async function (req, res) {
         { new: true }
       );
       savedata.isPublished = true;
-      savedata.publishedAt = Date();
+      savedata.publishedAt = Date.now();
       savedata.save();
       return res.status(200).send({ status: true, data: savedata });
     }
-    
-
-
   } catch (err) {
     res.status(500).send({ status: false, msg: err.message });
-
-}
+  }
 };
 
 const deleteBlogs = async function (req, res) {
   try {
     let data1 = req.params.blogId;
 
-    if (Object.keys(data1).length == 0) {
-      res.status(400).send({ status: false, msg: "BlogsId Required" });
-    }
+    // if (Object.keys(data1).length == 0) {
+    //   res.status(400).send({ status: false, msg: "BlogsId Required" });
+    // }
 
-    let savedata = await blogModel.findOne({ data1 });
-    if (!savedata) {
-      return res
-        .status(404)
-        .send({ status: false, msg: "No Such Data Found On That Id" });
-    } else {
-      let deleteData = await blogModel.updateMany(
-        { _id: data1 },
-        { isDeleted: true, deletedAt: Date() },
-        { new: true }
-      );
+    let deleteBlog = await blogModel.findOneAndUpdate(
+      { _id: data1, isDeleted: true },
+      { isDeleted: false, deletedAt: Date.now() },
+      { new: true }
+    );
+    if (!deleteBlog)
+      return res.status(404).send({
+        status: false,
+        msg: "block already deleted or not exist",
+      });
+    // let savedata = await blogModel.findOne({ data1 });
+    // if (!savedata) {
+    //   return res
+    //     .status(404)
+    //     .send({ status: false, msg: "No Such Data Found On That Id" });
+    // } else {
+    //   let deleteData = await blogModel.updateMany(
+    //     { _id: data1 },
+    //     { isDeleted: true, deletedAt: Date() },
+    //     { new: true }
+    //   );
 
-      res.status(201).send({ status: true, data: deleteData });
-    }
+    return res.status(201).send({ status: true, msg: "successfully deleted" });
   } catch (err) {
-    res.status(500).send({ status: false, msg: err.message });
+    return res.status(500).send({ status: false, msg: err.message });
   }
 };
 
