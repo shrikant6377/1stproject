@@ -8,12 +8,20 @@ router.post("/authors", authorContoller.createAuthor);
 
 router.get("/getblog", blogController.getBlogs);
 
-// router.put("/updateBlogs/:blogId",middleware.authentication,middleware.authorization,blogController.updateBlogs);
-router.delete("/deleteBlogs/:blogId", middleware.authentication, blogController.deleteBlogs);
+router.put(
+  "/updateBlogs/:blogId",
+  middleware.Authentication,
+  blogController.updateBlogs
+);
+router.delete(
+  "/deleteBlogs/:blogId",
+  middleware.Authentication,
+  blogController.deleteBlogs
+);
 router.delete("/deleteByQuery", blogController.deleteByQuery);
 
 // phase2
 router.post("/authorLogin", authorContoller.authorLogIn);
-router.post("/blogs" ,blogController.createBlog);
+router.post("/blogs", middleware.Authentication, blogController.createBlog);
 
 module.exports = router;

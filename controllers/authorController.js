@@ -22,13 +22,13 @@ const authorLogIn = async function (req, res) {
   let data2 = req.body.password;
   let checkData = await authorModel.findOne({ email: data1, password: data2 });
   if (!checkData) {
-    res.status(404).send({ status: false, msg: " data not found" });
+   return res.status(404).send({ status: false, msg: " data not found" });
   } else {
     let geneToken = jwt.sign(
-      { userId: checkData._id.toString() },
+      { authorId: checkData._id.toString() },
       "functionUp"
     );
-    // res.setHeader("x-api-key", checkData);
+    res.setHeader("x-api-key", geneToken);
     res.status(200).send({ status: true, Token: geneToken });
   }
 };

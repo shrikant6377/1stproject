@@ -1,14 +1,12 @@
 const mongoose = require("mongoose");
-let ObjectId = mongoose.Schema.Types.ObjectId;
-const { default: isEmail } = require("validator/lib/isEmail");
 
 const authorSchema = new mongoose.Schema(
   {
-    firstname: {
+    fname: {
       type: String,
       required: true,
     },
-    lastname: {
+    lname: {
       type: String,
       required: true,
     },
@@ -19,7 +17,7 @@ const authorSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
-      validate: [isEmail, "Enter a Valid Email"],
+      required:true
     },
     password: {
       type: String,

@@ -1,46 +1,38 @@
-const { default: mongoose } = require("mongoose");
+
 const authorModel = require("../models/authorModel");
 const blogModel = require("../models/blogModel");
-const jwt = require("jsonwebtoken");
 
-//const { find } = require("../models/authorModel");
+
 
 const createBlog = async function (req, res) {
-  // try {
-  //     let data = req.body;
-  //     let data1 = req.body.authorId;
-  //     let savedata = await authorModel.findById(data1);
-  //     if (!savedata) {
-  //         return res.status(400).send({ status: false, msg: 'No such Author is Present On tha AuthorId' });
-  //     } else {
-  //         let savedata1 = await blogModel.create(data);
-  //         return res.status(201).send({ status: true, data: savedata1 });
-  //     }
-  // }
-  // catch (err) {
-  //     return res.status(500).send({ status: false, msg: err.message });
-  // }}
   try {
-    if (req.body) {
-      let authorId = req.body.authorId;
-      if (!authorId) {
-        return res.status(400).send({ msg: "Author Id is required" });
-      }
-      let validationAuthorId = await authorModel.findById(authorId);
-
-      if (!validationAuthorId) {
-        return res.status(400({ msg: "enter valid authorId" }));
-      }
       let data = req.body;
-      let saveData = await blogModel.create(data);
-      res.status(201).send({ data: saveData });
+      //let data1 = req.body.authorId;
+      //let savedata = await authorModel.findById(data1);
+      // if (!savedata) {
+      //     return res.status(400).send({ status: false, msg: 'No such Author is Present On tha AuthorId' });
+      // } else {
+      //     let savedata1 = await blogModel.create(data);
+      //     return res.status(201).send({ status: true, data: savedata1 });
+      // }
+      let blogCreated = await blogModel.create(data);
+
+    if (data.isPublished === true) {
+      let mainBlog = await blogModel.findOneAndUpdate(
+        { _id: blogCreated._id },
+        { $set: { publishedAt: Date.now() } },
+        { new: true, upsert: true }
+      );
+      return res.status(201).send({ status: true, data: mainBlog })
     } else {
-      return res.status(400).send({ msg: "Bad request" });
+      return res.status(201).send({ status: true, data: blogCreated })
     }
-  } catch (error) {
-    res.status(500).send({ msg: "server error", error: error.message });
+
   }
-};
+  catch (err) {
+      return res.status(500).send({ status: false, msg: err.message });
+  }}
+
 
 const getBlogs = async function (req, res) {
   try {
@@ -104,28 +96,20 @@ const deleteBlogs = async function (req, res) {
     // }
 
     let deleteBlog = await blogModel.findOneAndUpdate(
-      { _id: data1, isDeleted: true },
-      { isDeleted: false, deletedAt: Date.now() },
+      { _id: data1},
+      { $set:{isDeleted: true}, deletedAt: Date.now() },
       { new: true }
     );
     if (!deleteBlog)
       return res.status(404).send({
         status: false,
         msg: "block already deleted or not exist",
-      });
-    // let savedata = await blogModel.findOne({ data1 });
-    // if (!savedata) {
-    //   return res
-    //     .status(404)
-    //     .send({ status: false, msg: "No Such Data Found On That Id" });
-    // } else {
-    //   let deleteData = await blogModel.updateMany(
-    //     { _id: data1 },
-    //     { isDeleted: true, deletedAt: Date() },
-    //     { new: true }
-    //   );
+      });else{
 
-    return res.status(201).send({ status: true, msg: "successfully deleted" });
+        return res.status(201).send({ status: true, msg: "successfully deleted" });
+      }
+   
+
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }
