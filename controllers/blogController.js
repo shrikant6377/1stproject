@@ -19,7 +19,7 @@ const createBlog = async function (req, res) {
   // }
   // catch (err) {
   //     return res.status(500).send({ status: false, msg: err.message });
-  // }
+  // }}
   try {
     if (req.body) {
       let authorId = req.body.authorId;
@@ -84,13 +84,14 @@ const updateBlogs = async function (req, res) {
         { $set: data },
         { new: true }
       );
+      
       savedata.isPublished = true;
       savedata.publishedAt = Date.now();
       savedata.save();
       return res.status(200).send({ status: true, data: savedata });
     }
   } catch (err) {
-    res.status(500).send({ status: false, msg: err.message });
+   return res.status(500).send({ status: false, msg: err.message });
   }
 };
 

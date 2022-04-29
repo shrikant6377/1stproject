@@ -28,7 +28,7 @@ const authorLogIn = async function (req, res) {
       { userId: checkData._id.toString() },
       "functionUp"
     );
-    res.setHeader("x-api-key", checkData);
+    // res.setHeader("x-api-key", checkData);
     res.status(200).send({ status: true, Token: geneToken });
   }
 };
