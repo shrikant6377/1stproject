@@ -1,81 +1,98 @@
 const jwt = require("jsonwebtoken");
+const mongoose = require('mongoose');
+const blogModel = require("../models/blogModel");
 
+/////////////////////// -AUTHENTICATION- //////////////////////////////
 
-
-const Authentication = function (req, res, next) {
+const Authentication = async function (req, res, next) {
   // compare the logged in user's Id and the Id in request
   try {
-    let Token = req.headers["x-api-key"];
-    console.log(Token);
-    if (!Token) {
+
+    const token = req.headers["x-api-key"];
+    if (!token) {
      return res.status(404).send({ status: false, msg: "token must be required in the header" });
     }
-    let decodedToken = jwt.verify(Token, "functionUp");
-    console.log(decodedToken);
 
-    if (!decodedToken) {
-    return  res.status(400).send({ status: false, msg: "invalid token" });
+     jwt.verify(token, "functionUp",function(error,data){
+      if (error){
+        return  res.status(400).send({ status: false, msg: "invalid token" });
+      }
+      next();
+    });
+      
+     } catch (error) { res.status(500).send({ status: false, msg: error.massage })}};
+
+
+//////////////////////// -AUTHORIZATION- ////////////////////////////////
+
+const Authorization =  async function (req, res, next) {
+  try {
+
+   const token = req.headers["x-api-key"];
+    const decodedToken = jwt.verify(token, "functionUp");
+
+/////////////////////// -TAKING AUTHORID FROM BODY- ///////////////
+
+    const authorIdFromBody = req.body.authorId
+    if(authorIdFromBody){
+     if(!mongoose.Types.ObjectId.isValid(authorIdFromBody)){
+       return res.status(400).send({status:false, msg:"enter a valid authorid in body"})
     }
 
-    const userId= req.body.authorId || req.params.authorId || req.query.authorId
-    if(decodedToken.authorId !==userId){
-      return res.status(400).send({status:false, msg:"you are not authorised to use"})
+    const loggedInAuthorId = decodedToken.authorId
+     if(authorIdFromBody != loggedInAuthorId){
+      return res.status(403).send({status:false, msg:"You are not authorize"})
+    }else{
+     return  next();
     }
-    
-
-    // req.authorId = decodedToken.authorId
-    next();
-  } catch (error) {
-   return res.status(500).send({ status: false, msg: error.massage });
   }
-};
 
-// // const authorization = function (req, res, next) {
-// //   try {
-// //     let token = req.headers["x-api-key"];
-// //     let decodedToken = jwt.verify(token, "functionUp");
 
-// //     let data2 = decodedToken.authorId;
-// //     // let data2 = authorId
-// //     console.log(data1);
+//////////////////////////// -TAKING AUTHORID FROM QUEARY- //////////////////////////
 
-// //     if ((data1 = req.params.blogId)) {
-// //       console.log(data1);
-// //       if (data1 !== data2) {
-// //         return res
-// //           .status(401)
-// //           .send({
-// //             status: false,
-// //             msg: 'Unauthorized "Cannot access Other"s Data',
-// //           });
-// //       }
-// //     } else if ((data1 = req.body.authorId)) {
-// //       console.log(data1);
-// //       if (data1 !== data2) {
-// //         return res
-// //           .status(401)
-// //           .send({
-// //             status: false,
-// //             msg: 'Unauthorized "Cannot access Other"s Data',
-// //           });
-// //       }
-// //     } else {
-// //       data1 = req.query.userId;
-// //       console.log(data1);
-// //       if (data1 !== data2) {
-// //         return res
-// //           .status(401)
-// //           .send({
-// //             status: false,
-// //             msg: 'Unauthorized "Cannot access Other"s Data',
-// //           });
-// //       }
-// //     }
+  const authorIdFromQuery = req.query.authorId
+  if(authorIdFromQuery){
+    if(!mongoose.Types.ObjectId.isValid(authorIdFromQuery)){
+      return res.status(400).send({status:false, msg:"enter a valid authorid in query"})
+    }
 
-// //     next();
-// //   } catch (error) {
-// //     res.status(500).send({ status: false, error: error.message });
-// //   }
-// // };
-module.exports = {Authentication };
+    const loggedInAuthorId = decodedToken.authorId
+     if(authorIdFromQuery != loggedInAuthorId){
+      return res.status(403).send({status:false, msg:"You are not authorize"})
+    }else{
+     return next();
+    }
+  }
+//////////////////////////// -TAKING BLOGID FROM PATH- ///////////////////////////
+
+  const blogIdFromPath =  req.params.blogIdFromPath 
+  if(blogIdFromPath){
+    if(!mongoose.Types.ObjectId.isValid(blogIdFromPath)){
+      return res.status(400).send({status:false, msg:"enter a valid blogid in path"})
+    }
+
+    const availableBlog = await blogModel.findById(blogIdFromPath)
+    if(!availableBlog){
+      return res.status(404).send({status:false,msg:"Blog id not found"})
+    }
+
+     const authorIdFromAvailableBlog = availableBlog.authorId
+     const loggedInAuthorId = decodedToken.authorId
+     if(authorIdFromAvailableBlog != loggedInAuthorId){
+      return res.status(403).send({status:false, msg:"You are not authorize"})
+    }else{
+     return next();
+    }
+
+  }
+   
+  return res.status(400).send({status:false, msg:"authorId or blogId id required "})
+  
+    
+  } catch (error) { res.status(500).send({ status: false, error: error.message })}};
+
+
+
+
+module.exports = {Authentication,Authorization };
 

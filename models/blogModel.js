@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 let objectId = mongoose.Schema.Types.ObjectId;
 
+
+////////////////////// -BLOG SCHEMA- /////////////////
+
+
 const blogSchema = new mongoose.Schema(
   {
     title: {
@@ -17,6 +21,7 @@ const blogSchema = new mongoose.Schema(
       ref: "Project_authors",
     },
     tags: [String],
+    
     category: {
       type: [String],
       required: true,
