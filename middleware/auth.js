@@ -65,7 +65,7 @@ const Authorization =  async function (req, res, next) {
   }
 //////////////////////////// -TAKING BLOGID FROM PATH- ///////////////////////////
 
-  const blogIdFromPath =  req.params.blogIdFromPath 
+  const blogIdFromPath =  req.params.blogId
   if(blogIdFromPath){
     if(!mongoose.Types.ObjectId.isValid(blogIdFromPath)){
       return res.status(400).send({status:false, msg:"enter a valid blogid in path"})

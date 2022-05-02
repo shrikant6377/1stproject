@@ -89,10 +89,8 @@ const getBlogs = async function (req, res) {
 
 /////////////////////////// -UPDATING BLOGS- //////////////////////////
 
-
 const updateBlogs = async function (req, res) {
   try {
-
     const blogId = req.params.blogId;
 
     if (Object.keys(blogId).length == 0) {
@@ -137,7 +135,7 @@ const deleteBlogs = async function (req, res) {
     }
     
     const blogDeleted = await blogModel.findByIdAndUpdate({_id: blogId}, {isDeleted:true,deletedAt:Date.now()}) 
-    return res.status(200).send({ status:true, msg:" Blog is deleted succesfully"})
+    return res.status(200).send({ status:true, msg:" Blog are deleted"})
    
 
   } catch (err) {res.status(500).send({ status: false, msg: err.message })}};
@@ -153,12 +151,13 @@ const deleteByQuery = async function (req, res) {
       const deletedBlogByQuery = await blogModel.updateMany({ $or: [ {authorId:query.authorId }, {category:query.category },
       {tags:query.tags}, {subcategory:query.subcategory},{isPublished:query.isPublished}]},
       {$set:{isDeleted:true , deletedAt:Date.now()}})
+      console.log(deletedBlogByQuery);
 
       if(deletedBlogByQuery.modifiedCount===0){
         return res.status(404).send({status:false, msg: "Blogs not found"})
       }
       
-      return res.status(200).send({status:true, msg:"Blogs are deleted"})
+      return res.status(200).send({status:true, msg:"Blogs are deleted successfully."})
 
     }
   } catch (err) { res.status(500).send({ msg: err.message })}};

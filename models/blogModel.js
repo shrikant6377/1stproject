@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 let objectId = mongoose.Schema.Types.ObjectId;
 
-
 ////////////////////// -BLOG SCHEMA- /////////////////
 
 
@@ -23,7 +22,7 @@ const blogSchema = new mongoose.Schema(
     tags: [String],
     
     category: {
-      type: [String],
+      type: String,
       required: true,
     },
     subcategory: [String],

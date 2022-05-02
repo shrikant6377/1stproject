@@ -9,7 +9,7 @@ const createAuthor = async function (req, res) {
   try {
 
     let data = req.body;
-
+    
     const email = data.email;
     if (!email){
       return res.status(400).send({status:false, msg:"email is required"})
@@ -42,7 +42,7 @@ const createAuthor = async function (req, res) {
     }
 
      const checkTitle = data.title
-   if (checkTitle){
+     if (checkTitle){
      if (checkTitle=="Mr" || checkTitle== "Mrs" || checkTitle=="Miss"){
        
        const authorCreated = await authorModel.create(data);
