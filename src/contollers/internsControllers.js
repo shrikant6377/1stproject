@@ -14,7 +14,7 @@ const studentCreate=async (req,res)=>{
     if(!(validators.isEmail(email)))return res.status(400).send({status:false,msg:'plese enter valid email id'})
     let emailex=await collegeModel.findOne({email:email})
     console.log(emailex.length)
-    if(emailex)return res.status(400).send({status:false,message:'email already registerd'})
+    if(!emailex)return res.status(400).send({status:false,message:'email already registerd'})
     if(!mobile)return res.status(400).send({status:false,mesggage:'please enter the mobile number '})
     if(!(validators.isMobilePhone(number)))return res.status(400).send({status:false,message:'please enter the valid mobile number'})
       let mobileex=await collegeModel.findOne({mobile:mobile})
