@@ -16,7 +16,7 @@ const getdata = async (req, res) => {
 
     }
     catch (e) {
-        res.send(e.message)
+        res.status(500).send( {status:false,message:err})
 
     }
 }
